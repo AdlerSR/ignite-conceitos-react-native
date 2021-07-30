@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 
 import { Header } from '../components/Header';
 import { Task, TasksList } from '../components/TasksList';
@@ -9,6 +9,20 @@ export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   function handleAddTask(newTaskTitle: string) {
+    const findEqualTaskTitle = tasks.find(task => task.title.toLowerCase() === newTaskTitle.toLowerCase());
+
+    if(findEqualTaskTitle) {
+      Alert.alert(
+        "Tarefa Duplicada",
+        "Já existe outra tarefa adicionada com o mesmo nome",
+        [
+          { text: "ok" }
+        ]
+      );
+
+      return;
+    }
+
     setTasks([...tasks, {done: false, id: tasks.length + 1 ,title: newTaskTitle}])
   }
 
@@ -27,6 +41,14 @@ export function Home() {
     setTasks(filterTask);
   }
 
+  function handleEditTask(id: number, newTaskTitle: string) {
+    setTasks(tasks.map(item => 
+      item.id === id 
+      ? {...item, title: newTaskTitle} 
+      : item 
+    ))
+  }
+
   return (
     <View style={styles.container}>
       <Header tasksCounter={tasks.length} />
@@ -37,6 +59,7 @@ export function Home() {
         tasks={tasks} 
         toggleTaskDone={handleToggleTaskDone}
         removeTask={handleRemoveTask} 
+        editTask={handleEditTask}
       />
     </View>
   )
